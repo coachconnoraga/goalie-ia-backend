@@ -43,7 +43,7 @@ app.post('/api/chat', async (req, res) => {
     const stream = await anthropic.messages.create({
       max_tokens: 1024,
       messages: messages,
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-sonnet-20240620',
       system: SYSTEM_PROMPT,
       stream: true,
     });
