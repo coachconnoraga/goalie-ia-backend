@@ -2576,5 +2576,84 @@ The key takeaway from this guide is the importance of mastering these fundamenta
 
 In essence, while the path to greatness in lacrosse goaltending involves a blend of adherence to proven strategies and personal innovation, it is this balance that will set you apart. Embrace the core principles, build your foundation with them, and then adapt and expand upon them to develop your distinctive approach to the game. By doing so, you will be able to maximize your performance and continue excel for many years to come.
 
+---
+
+## MODULE: COLLEGE RECRUITING & OUTREACH
+
+**AGENT INSTRUCTIONS:** When a goalie or parent asks about college recruiting, making a highlight tape, or contacting college coaches, use the following Adaptive Goaltending frameworks. Do not invent recruiting advice outside of these parameters.
+
+### 1. THE 5 PRE-RECRUITING PILLARS
+If a user asks how to start the recruiting process or what they need to do to get recruited, guide them through these 5 pillars:
+1. **Academic Check:** Better grades mean more opportunities and recruiting leeway. If two goalies are equally skilled, the coach will take the one with the GPA that is 0.5 points higher.
+2. **Highlight Tape:** A 2-3 minute tape is mandatory. (See "Highlight Tape Rules" below).
+3. **Lifting:** Train for explosive power, not just to get "jacked." Once a base level of strength is established, shift focus entirely to speed and explosiveness.
+4. **Mental Prep:** Create a strict pre-game and in-game routine. Stick to it regardless of performance to maintain a balanced, healthy baseline.
+5. **At the Showcase/Tournament:** Show up early, get in the goal FIRST (act like a starter), get a proper warmup, and manage basic health (water intake, sleep, balanced meals, focus).
+
+### 2. HIGHLIGHT TAPE RULES (VISUAL RESUME)
+If a user asks how to make a highlight tape, critique a tape, or what coaches look for, use these strict guidelines. Remind them that they have about 30 seconds to make a good first impression.
+* **The Intro (10-15 seconds):** Must include Grad Year, Position, High School/Club Teams. Academics (GPA, Test Scores, Accolades). Athletics (Save %, GAA, Accolades).
+* **Start Strong:** Put the absolute best plays first. Showcase as many top skills as possible in the first 15 seconds.
+* **Show Range:** Focus primarily on saves, but must include clears and out-of-crease plays to demonstrate a complete skillset.
+* **Keep it Short:** 2-3 minutes MAXIMUM. Cut out "easy" plays (slow shots or simple passes) that any goalie could make.
+* **Film & Edit Quality:** Film horizontally for YouTube, vertically for IG/TikTok. Zoom in enough so coaches can see technique. Keep edits simple and clean—no fancy video effects.
+* **Audio:** Use instrumental music only. Must be clean and appropriate (zero swearing).
+
+### 3. OUTREACH STRATEGY (EMAILING COACHES)
+If a user asks how to email a coach, explain that generic emails get zero replies. Give them this structural formula:
+* **Subject Line:** Must be clear. Format: "[Name], Goalie - Class of [Year] - Interested in [University Name] Lacrosse"
+* **The "Why Them?":** The user MUST include a specific reason they are attracted to that specific program (e.g., defensive strategy, alumni network, specific major). Do not skip this.
+* **The Call to Action:** Always end by linking the highlight tape and asking the coach to watch it.
+
+### 4. OFFICIAL AGA EMAIL TEMPLATES
+When providing an email template, ask the user what style they prefer or provide the one that best fits their situation. Tell them to fill in the bracketed information `[like this]`.
+
+#### Template A: Direct & Data-Focused (Best for high academic/stat performers)
+Subject: Prospect - [Your Name] - Lacrosse Goalie - Class of [Graduating Year]
+
+Dear Coach [Coach's Last Name],
+My name is [Your Name], and I am a lacrosse goalie in the Class of [Graduating Year] at [Your High School]. I am highly interested in your program at [University Name]. I've been particularly impressed by [Specific Reason for Interest, e.g., your team's consistent success, the strong engineering program], and I believe my skills and academic profile would be a great fit for your team.
+
+Academically, I maintain a [Your GPA] GPA. My current standardized test scores are [Your ACT/SAT Score]. I was recently honored with [Notable School Accolade]. On the field, I consistently deliver a save percentage of [Your Save Percentage]% and a goals allowed average of [Your GAA]. [Optional: I also recorded a [insert additional impressive stats here]]. Last season, I was recognized as [Athletic Accolade]. Beyond lacrosse, I am actively involved in [Extracurricular Accolade].
+
+You can view my highlight tape here: [Link to Highlight Tape]
+Also, you can see me play live at the following events this summer: [Name, date, and location of each event]
+
+Thank you for your time and consideration. I look forward to learning more about your program.
+Sincerely,
+[Your Name] | [Your Phone Number] | [Your Email Address] | [Link to Recruiting Profile]
+
+#### Template B: Brief & Impactful (Best for quick reads)
+Subject: Lacrosse Goalie Prospect: [Your Name], [Graduating Year]
+
+Coach [Coach's Last Name],
+I am writing to express my strong interest in playing lacrosse at [University Name]. I have closely followed [Specific Reason for Interest] and am very drawn to what your program offers. I am a dedicated goalie from the Class of [Graduating Year] at [Your High School].
+
+My academic achievements include a [Your GPA] GPA and a [Your ACT/SAT Score]. I also received [Notable School Accolade]. As a goalie, I consistently post a [Your Save Percentage]% save rate and a [Your GAA] goals allowed average. My athletic achievements include [Athletic Accolade]. Off the field, I contribute as [Extracurricular Accolade].
+
+Please find my highlight tape below: [Link to Highlight Tape]
+Also, you can see me play live at the following events this summer: [Name, date, and location of each event]
+
+Thank you for your consideration.
+Best regards,
+[Your Name] | [Your Phone Number] | [Your Email Address]
+
+#### Template C: Focused on Fit & Future (Best for highlighting program culture)
+Subject: [Your Name], Goalie - Class of [Graduating Year] - Interested in [University Name] Lacrosse
+
+Dear Coach [Coach's Last Name],
+My name is [Your Name], a Class of [Graduating Year] lacrosse goalie from [Your High School]. I am highly impressed by [University Name]'s [Specific Reason for Interest, e.g., strong academic reputation, recent success], and I believe I could be a valuable asset to your team both on and off the field.
+
+Academically, I have achieved a [Your GPA] GPA and scored a [Your ACT/SAT Score]. I'm also proud to have earned [Notable School Accolade]. My on-field statistics demonstrate my effectiveness in goal: a [Your Save Percentage]% save percentage and a [Your GAA] goals allowed average. I've also been honored with [Athletic Accolade]. Outside of lacrosse, I actively participate in [Extracurricular Accolade].
+
+My highlight tape can be viewed here: [Link to Highlight Tape]
+Also, you can see me play live at the following events this summer: [Name, date, and location of each event]
+
+I appreciate your time and would welcome the opportunity to discuss how I can contribute to your program.
+Sincerely,
+[Your Name] | [Your Phone Number] | [Your Email Address]
+
+---
+
 
 WWW.ADAPTIVEGOALTENDING.COM
