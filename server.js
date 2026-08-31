@@ -1,5 +1,5 @@
 import express from 'express';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import fs from 'fs';
@@ -12,11 +12,11 @@ app.use(express.json());
 
 console.log("Iniciando servidor de Adaptive Goaltending...");
 
-// 1. Verificamos que la llave exista para que no explote en silencio
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error("⚠️ ALERTA: No se encontró la ANTHROPIC_API_KEY en Render.");
+// 1. Verificamos que la llave de OpenAI exista
+if (!process.env.OPENAI_API_KEY) {
+  console.error("⚠️ ALERTA: No se encontró la OPENAI_API_KEY en Render.");
 }
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'llave_nula' });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'llave_nula' });
 
 // 2. Leemos tu archivo con seguro anti-accidentes
 let SYSTEM_PROMPT = "Eres un coach de lacrosse."; 
@@ -40,17 +40,23 @@ app.post('/api/chat', async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const stream = await anthropic.messages.create({
-      max_tokens: 1024,
-      messages: messages,
-      model: 'claude-sonnet-4-6',
-      system: SYSTEM_PROMPT,
+    // Unimos el SYSTEM_PROMPT al inicio del historial de mensajes
+    const fullMessages = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...(messages || [])
+    ];
+
+    const stream = await openai.chat.completions.create({
+      model: process.env.MODEL_NAME || 'gpt-4o-mini',
+      messages: fullMessages,
       stream: true,
     });
 
     for await (const chunk of stream) {
-      if (chunk.type === 'content_block_delta') {
-        res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
+      const textChunk = chunk.choices[0]?.delta?.content || '';
+      if (textChunk) {
+        // Mantenemos el mismo formato JSON { text: ... } para tu frontend
+        res.write(`data: ${JSON.stringify({ text: textChunk })}\n\n`);
       }
     }
     res.end();
@@ -62,7 +68,7 @@ app.post('/api/chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-// 3. LA SOLUCIÓN DEL PUERTO: Le decimos explícitamente '0.0.0.0' a Render
+// 3. Le decimos explícitamente '0.0.0.0' a Render
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Motor IA Encendido y escuchando puertas en el puerto ${PORT}`);
 });
