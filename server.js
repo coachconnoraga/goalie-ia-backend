@@ -28,47 +28,41 @@ try {
 }
 
 app.post('/api/chat', async (req, res) => {
-  const { messages } = req.body;
-  const userToken = req.headers['authorization'];
+  const fs = require('fs');
+const path = require('path');
 
-  if (userToken !== process.env.SECRET_TOKEN) {
-    return res.status(401).json({ error: 'Acceso denegado. Ingresa desde la academia.' });
-  }
-
+// NUEVA RUTA PARA PROCESAR EL AUDIO
+app.post('/api/transcribe', async (req, res) => {
   try {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
+    // 1. Verificamos el token igual que en el chat
+    const authHeader = req.headers.authorization;
+    if (authHeader !== process.env.SECRET_TOKEN) {
+      return res.status(401).json({ error: "No autorizado" });
+    }
 
-    // Unimos el SYSTEM_PROMPT al inicio del historial de mensajes
-    const fullMessages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...(messages || [])
-    ];
+    const audioBase64 = req.body.audio;
+    if (!audioBase64) return res.status(400).json({ error: 'No audio provided' });
 
-    const stream = await openai.chat.completions.create({
-      model: process.env.MODEL_NAME || 'gpt-4o-mini',
-      messages: fullMessages,
-      stream: true,
+    // 2. Extraer el código Base64 y convertirlo a un archivo temporal real
+    const base64Data = audioBase64.replace(/^data:audio\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    const filePath = path.join(__dirname, `temp_audio_${Date.now()}.webm`);
+    fs.writeFileSync(filePath, buffer);
+
+    // 3. Enviar el archivo temporal a Whisper de OpenAI
+    const transcription = await openai.audio.transcriptions.create({
+      file: fs.createReadStream(filePath),
+      model: "whisper-1",
     });
 
-    for await (const chunk of stream) {
-      const textChunk = chunk.choices[0]?.delta?.content || '';
-      if (textChunk) {
-        // Mantenemos el mismo formato JSON { text: ... } para tu frontend
-        res.write(`data: ${JSON.stringify({ text: textChunk })}\n\n`);
-      }
-    }
-    res.end();
+    // 4. Borrar el archivo temporal para no llenar el disco del servidor
+    fs.unlinkSync(filePath);
+
+    // 5. Devolver el texto al usuario
+    res.json({ text: transcription.text });
   } catch (error) {
-    console.error("Error en conexión:", error);
-    res.status(500).json({ error: 'Error interno de conexión.' });
+    console.error("Transcription error:", error);
+    res.status(500).json({ error: "Error processing audio" });
   }
-});
-
-const PORT = process.env.PORT || 3000;
-
-// 3. Le decimos explícitamente '0.0.0.0' a Render
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Motor IA Encendido y escuchando puertas en el puerto ${PORT}`);
 });
