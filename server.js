@@ -6,44 +6,35 @@ const path = require('path');
 
 const app = express();
 
-// AUMENTO DE LÍMITE: Esto es vital para que acepte las fotos y audios sin explotar.
+// Aumentamos el límite de memoria para que soporte audios y fotos sin bloquearse
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Inicializar OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Leer el archivo de conocimiento maestro
 let systemPrompt = "";
 try {
   systemPrompt = fs.readFileSync(path.join(__dirname, 'conocimiento.txt'), 'utf8');
 } catch (err) {
-  console.error("Advertencia: No se encontró el archivo conocimiento.txt. Asegúrate de que esté en GitHub.");
+  console.error("Advertencia: No se encontró el archivo conocimiento.txt.");
 }
 
-// ==========================================
 // 1. RUTA PRINCIPAL DE CHAT E IMÁGENES
-// ==========================================
 app.post('/api/chat', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
   if (token !== process.env.SECRET_TOKEN) {
-    return res.status(401).json({ error: "No autorizado. Verifica tu SECRET_TOKEN." });
+    return res.status(401).json({ error: "No autorizado." });
   }
 
   try {
     const userMessages = req.body.messages || [];
-    
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...userMessages
-    ];
+    const messages = [{ role: "system", content: systemPrompt }, ...userMessages];
 
-    // Llamada a OpenAI con max_tokens explícito (requerido a veces por GPT-4o Vision)
     const stream = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: messages,
@@ -66,33 +57,31 @@ app.post('/api/chat', async (req, res) => {
 
   } catch (error) {
     console.error("Error en /api/chat:", error);
-    // Ahora enviamos el error real al frontend para poder diagnosticarlo
     if (!res.headersSent) {
-      res.status(500).json({ error: error.message || "Error procesando el chat o imagen." });
+      res.status(500).json({ error: error.message || "Error procesando el chat." });
     }
   }
 });
 
-// ==========================================
 // 2. RUTA PARA EL MICRÓFONO (WHISPER AI)
-// ==========================================
 app.post('/api/transcribe', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
   if (token !== process.env.SECRET_TOKEN) {
-    return res.status(401).json({ error: "No autorizado. Verifica tu SECRET_TOKEN." });
+    return res.status(401).json({ error: "No autorizado." });
   }
 
   try {
     const audioBase64 = req.body.audio;
     if (!audioBase64) return res.status(400).json({ error: 'No se recibió audio' });
 
-    // Limpieza a prueba de balas del código Base64
+    // Limpiamos el código Base64 para que OpenAI lo pueda leer
     const base64Data = audioBase64.split(',')[1]; 
     const buffer = Buffer.from(base64Data, 'base64');
     
-    const filePath = path.join(__dirname, `temp_audio_${Date.now()}.webm`);
+    // Guardamos el audio con extensión genérica compatible con iOS y Android
+    const filePath = path.join(__dirname, `temp_audio_${Date.now()}.mp4`);
     fs.writeFileSync(filePath, buffer);
 
     const transcription = await openai.audio.transcriptions.create({
