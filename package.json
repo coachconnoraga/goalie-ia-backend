@@ -1,12 +1,22 @@
 {
-  "name": "ai-coach",
+  "name": "aga-ai-coach-backend",
   "version": "1.0.0",
-  "type": "module",
-  "scripts": { "start": "node server.js" },
+  "description": "Backend for Adaptive Goaltending AI Coach",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "openai": "^4.0.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
+    "openai": "^4.67.3",
+    "stripe": "^17.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
