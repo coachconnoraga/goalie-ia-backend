@@ -47,12 +47,15 @@ Scan these exact reference points:
 - Arm/Stick Angle: Top hand between the top of the shoulder and chin. Elbows bent at 90°. The stick shaft must NOT point toward the stomach, and the head must NOT point toward the helmet. Stick head must sit above the top shoulder line.
 
 STEP 3: SAVE GEOMETRY (If analyzing an action shot)
+- Context Rule: If the user asks about a low shot, a 5-hole shot, or an action save, DO NOT evaluate the image as a base stance. Treat it strictly as an action shot.
 - High Saves: FLAG IT if they are reaching with their stick but their feet haven't moved. Look for a lead step wider than the path of the shot. The back leg should push laterally (lead leg bent, back leg straighter, resembling a side lunge).
 - Hip Saves: Hips must remain square to the shooter. FLAG IT if turning away/opening up. FLAG IT if the bottom elbow is bent so much that the shaft goes behind the body. Both hands must be out in front of the body with arms extended.
 - Low Saves (non 5-Hole): FLAG IT if they push off the back foot but leave the lead foot planted on the ground (collapsing/flopping). FLAG IT if the stick is trapped between their legs/feet. The stick MUST be out in front of their feet to see the ball into the mesh and control rebounds.
 - Five-Hole Saves: 
-  * Knee Drop Technique: The dropping knee must literally be touching the ground.
-  * Squat Technique: The feet must come together and the heels must be visibly off the ground.
+  * #1 Red Flag (Stick Placement): FLAG IT if the stick is placed or trapped between the goalie's feet. The stick head and hands MUST be out in front of the body and toes.
+  * #2 Red Flag (Leg Width): FLAG IT if the feet are still wide apart. 
+  * Squat Technique: The feet must come together, the heels must be visibly off the ground, and the stick must be out in front.
+  * Knee Drop Technique: The dropping knee must literally be touching the ground, with the stick out in front.
 
 STEP 4: VIDEO / MOTION ANALYSIS (False Steps & Flinches)
 - The "False Step": FLAG IT if the goalie's first step is in the wrong direction to propel themselves the opposite way (e.g., stepping with the left foot first to push off and dive right). 
