@@ -6,34 +6,60 @@ const path = require('path');
 
 const app = express();
 
-// Aumentamos el límite de memoria a 50mb para soportar audios e imágenes en alta calidad
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Inicializar OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Leer el archivo de conocimiento maestro
 let systemPrompt = "";
 try {
   systemPrompt = fs.readFileSync(path.join(__dirname, 'conocimiento.txt'), 'utf8');
 } catch (err) {
-  console.error("Advertencia: No se encontró el archivo conocimiento.txt. Asegúrate de que esté en GitHub.");
+  console.error("Advertencia: No se encontró el archivo conocimiento.txt.");
 }
 
 // ==========================================
-// 1. RUTA PRINCIPAL DE CHAT E IMÁGENES
+// SISTEMA ANTI-TRAMPAS (HUELLAS Y IP TRACKING)
+// ==========================================
+const FREE_LIMIT = 7;
+const ipUsage = new Map();
+const deviceUsage = new Map();
+
+// ==========================================
+// 1. RUTA PRINCIPAL DE CHAT 
 // ==========================================
 app.post('/api/chat', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
   if (token !== process.env.SECRET_TOKEN) {
-    return res.status(401).json({ error: "No autorizado. Verifica tu SECRET_TOKEN." });
+    return res.status(401).json({ error: "No autorizado." });
   }
+
+  // --- LOGICA DE BLOQUEO (ANTI-INCOGNITO / ANTI-TOR / MULTIPLES CORREOS) ---
+  const deviceId = req.headers['x-device-id'] || 'unknown';
+  const isPremiumClaim = req.headers['x-is-premium'] === 'true';
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+  if (!isPremiumClaim) {
+    const ipCount = ipUsage.get(ip) || 0;
+    const deviceCount = deviceUsage.get(deviceId) || 0;
+
+    // Si la IP o el Hardware pasaron los 7 mensajes, rechazar la conexión de inmediato
+    if (ipCount >= FREE_LIMIT || (deviceId !== 'unknown' && deviceCount >= FREE_LIMIT)) {
+      return res.status(403).json({ error: "FREE_TRIAL_EXCEEDED" });
+    }
+
+    // Sumar 1 mensaje al contador de este dispositivo e IP
+    ipUsage.set(ip, ipCount + 1);
+    if (deviceId !== 'unknown') {
+      deviceUsage.set(deviceId, deviceCount + 1);
+    }
+  }
+  // ------------------------------------------------------------------------
 
   try {
     const userMessages = req.body.messages || [];
@@ -71,25 +97,23 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // ==========================================
-// 2. RUTA PARA EL MICRÓFONO (WHISPER AI - SPEECH TO TEXT)
+// 2. RUTA PARA EL MICRÓFONO (WHISPER)
 // ==========================================
 app.post('/api/transcribe', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
   if (token !== process.env.SECRET_TOKEN) {
-    return res.status(401).json({ error: "No autorizado. Verifica tu SECRET_TOKEN." });
+    return res.status(401).json({ error: "No autorizado." });
   }
 
   try {
     const audioBase64 = req.body.audio;
     if (!audioBase64) return res.status(400).json({ error: 'No se recibió audio' });
 
-    // Limpieza del código Base64
     const base64Data = audioBase64.split(',')[1]; 
     const buffer = Buffer.from(base64Data, 'base64');
     
-    // Guardar el archivo temporalmente
     const filePath = path.join(__dirname, `temp_audio_${Date.now()}.webm`);
     fs.writeFileSync(filePath, buffer);
 
@@ -102,30 +126,28 @@ app.post('/api/transcribe', async (req, res) => {
     res.json({ text: transcription.text });
 
   } catch (error) {
-    console.error("Error en la transcripción de audio:", error);
+    console.error("Error en la transcripción:", error);
     res.status(500).json({ error: error.message || "Error procesando el audio." });
   }
 });
 
 // ==========================================
-// 3. RUTA PARA LA VOZ DEL COACH (TEXT TO SPEECH) - *NUEVO*
+// 3. RUTA TEXT TO SPEECH (TTS)
 // ==========================================
 app.post('/api/tts', async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
 
   if (token !== process.env.SECRET_TOKEN) {
-    return res.status(401).json({ error: "No autorizado. Verifica tu SECRET_TOKEN." });
+    return res.status(401).json({ error: "No autorizado." });
   }
 
   try {
     const { text } = req.body;
     if (!text) return res.status(400).json({ error: "No text provided" });
 
-    // Limpiar caracteres de formato (negritas, cursivas) para que la IA lea natural
     const cleanText = text.replace(/[*#_`>]/g, '');
 
-    // Generar el audio con la voz "onyx" (puedes cambiarla a 'echo', 'fable', 'alloy', 'nova' o 'shimmer')
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",
       voice: "onyx", 
@@ -143,9 +165,6 @@ app.post('/api/tts', async (req, res) => {
   }
 });
 
-// ==========================================
-// INICIAR EL SERVIDOR
-// ==========================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor del AGA Coach corriendo en el puerto ${PORT}`);
