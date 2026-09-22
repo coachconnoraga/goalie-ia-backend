@@ -3,6 +3,7 @@ const cors = require('cors');
 const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -10,10 +11,12 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Configuración de OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Cargar conocimiento
 let systemPrompt = "";
 try {
   systemPrompt = fs.readFileSync(path.join(__dirname, 'conocimiento.txt'), 'utf8');
@@ -22,11 +25,23 @@ try {
 }
 
 // ==========================================
-// SISTEMA ANTI-TRAMPAS (HUELLAS Y IP TRACKING)
+// CONEXIÓN A MONGODB (BASE DE DATOS)
 // ==========================================
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('✅ Conectado exitosamente a la Base de Datos MongoDB'))
+  .catch(err => console.error('❌ Error conectando a MongoDB:', err));
+
+// Estructura de la Base de Datos para el límite de mensajes
+const trackerSchema = new mongoose.Schema({
+  identifier: { type: String, required: true, unique: true }, // Guarda la IP o la Huella del Dispositivo
+  count: { type: Number, default: 0 },
+  lastUsed: { type: Date, default: Date.now }
+});
+const Tracker = mongoose.model('Tracker', trackerSchema);
+
 const FREE_LIMIT = 7;
-const ipUsage = new Map();
-const deviceUsage = new Map();
 
 // ==========================================
 // 1. RUTA PRINCIPAL DE CHAT 
@@ -39,24 +54,41 @@ app.post('/api/chat', async (req, res) => {
     return res.status(401).json({ error: "No autorizado." });
   }
 
-  // --- LOGICA DE BLOQUEO (ANTI-INCOGNITO / ANTI-TOR / MULTIPLES CORREOS) ---
+  // --- LÓGICA DE BLOQUEO INVULNERABLE EN MONGODB ---
   const deviceId = req.headers['x-device-id'] || 'unknown';
   const isPremiumClaim = req.headers['x-is-premium'] === 'true';
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
   if (!isPremiumClaim) {
-    const ipCount = ipUsage.get(ip) || 0;
-    const deviceCount = deviceUsage.get(deviceId) || 0;
+    try {
+      // Buscar en la Base de Datos la computadora (deviceId) y la red WiFi (IP)
+      let deviceRecord = await Tracker.findOne({ identifier: deviceId });
+      let ipRecord = await Tracker.findOne({ identifier: ip });
 
-    // Si la IP o el Hardware pasaron los 7 mensajes, rechazar la conexión de inmediato
-    if (ipCount >= FREE_LIMIT || (deviceId !== 'unknown' && deviceCount >= FREE_LIMIT)) {
-      return res.status(403).json({ error: "FREE_TRIAL_EXCEEDED" });
-    }
+      const deviceCount = deviceRecord ? deviceRecord.count : 0;
+      const ipCount = ipRecord ? ipRecord.count : 0;
 
-    // Sumar 1 mensaje al contador de este dispositivo e IP
-    ipUsage.set(ip, ipCount + 1);
-    if (deviceId !== 'unknown') {
-      deviceUsage.set(deviceId, deviceCount + 1);
+      // Si cualquiera de los dos ya gastó 7 mensajes, se rechaza inmediatamente
+      if (ipCount >= FREE_LIMIT || (deviceId !== 'unknown' && deviceCount >= FREE_LIMIT)) {
+        return res.status(403).json({ error: "FREE_TRIAL_EXCEEDED" });
+      }
+
+      // Si aún tienen saldo, sumar 1 mensaje y guardarlo en la Base de Datos
+      if (deviceId !== 'unknown') {
+        await Tracker.findOneAndUpdate(
+          { identifier: deviceId },
+          { $inc: { count: 1 }, lastUsed: Date.now() },
+          { upsert: true, new: true }
+        );
+      }
+      await Tracker.findOneAndUpdate(
+        { identifier: ip },
+        { $inc: { count: 1 }, lastUsed: Date.now() },
+        { upsert: true, new: true }
+      );
+
+    } catch (dbError) {
+      console.error("Error consultando Base de Datos:", dbError);
     }
   }
   // ------------------------------------------------------------------------
@@ -91,7 +123,7 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error("Error en /api/chat:", error);
     if (!res.headersSent) {
-      res.status(500).json({ error: error.message || "Error procesando el chat o imagen." });
+      res.status(500).json({ error: error.message || "Error procesando el chat." });
     }
   }
 });
